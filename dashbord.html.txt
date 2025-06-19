@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <title>لوحة تحكم الأدمن - MARK</title>
+  <script type="module" src="firebase.js"></script>
+  <script type="module">
+    import { db, ref, onValue, push, update } from "./firebase.js";
+
+    const pendingRef = ref(db, "pending_users");
+    const approvedRef = ref(db, "approved_users");
+
+    function approveUser(key, user) {
+      push(approvedRef, user)
+        .then(() => {
+          update(ref(db, "pending_users/" + key), { approved: true });
+          alert("تمت الموافقة على المستخدم: " + user.username);
+          location.reload();
+        })
+        .catch((error) => alert("خطأ في الموافقة: " + error.message));
+    }
+
+    function loadPendingUsers() {
+      const container = document.getElementById("pending-list");
+      container.innerHTML = "<p>جارٍ تحميل الطلبات...</p>";
+
+      onValue(pendingRef, (snapshot) => {
+        const data = snapshot.val();
+        container.innerHTML = "";
+        if (!data) {
+          container.innerHTML = "<p>لا توجد طلبات جديدة.</p>";
+          return;
+        }
+        Object.entries(data).forEach(([key, user]) => {
+          if (user.approved) return;
+          const div = document.createElement("div");
+          div.style.border = "1px solid #ccc";
+          div.style.padding = "10px";
+          div.style.margin = "10px";
+          div.style.borderRadius = "8px";
+          div.innerHTML = `
+            <p><strong>اسم المستخدم:</strong> ${user.username}</p>
+            <p><strong>مبلغ الاشتراك:</strong> ${user.amount} د.ع</p>
+            <button id="approve-${key}">موافقة</button>
+          `;
+          container.appendChild(div);
+          document.getElementById(`approve-${key}`).onclick = () => approveUser(key, user);
+        });
+      });
+    }
+
+    window.onload = () => {
+      loadPendingUsers();
+    };
+  </script>
+  <style>
+    body {
+      font-family: sans-serif;
+      direction: rtl;
+      background: #f5f5f5;
+      padding: 20px;
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    #pending-list div:hover {
+      background-color: #e1ffe1;
+    }
+    button {
+      background-color: green;
+      border: none;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h2>طلبات المستخدمين بانتظار الموافقة</h2>
+  <div id="pending-list">
+    <!-- هنا تظهر الطلبات -->
+  </div>
+</body>
+</html>

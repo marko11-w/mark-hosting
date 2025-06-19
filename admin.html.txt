@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>دخول الأدمن - MARK</title>
+  <style>
+    body { font-family: sans-serif; direction: rtl; text-align: center; background: #f1f1f1; }
+    .box { margin-top: 100px; padding: 30px; background: white; display: inline-block; border-radius: 10px; }
+    input, button { margin: 10px; padding: 10px; width: 250px; }
+    button { background: #333; color: white; border: none; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>دخول الأدمن</h2>
+    <input id="admin_pass" type="password" placeholder="كلمة مرور الأدمن"><br>
+    <button onclick="check()">دخول</button>
+    <p id="msg" style="color:red;"></p>
+  </div>
+
+  <script>
+    function check() {
+      const pass = document.getElementById("admin_pass").value;
+      if (pass === "tahsen.2001") {
+        window.location.href = "dashboard.html";
+      } else {
+        document.getElementById("msg").textContent = "❌ كلمة المرور غير صحيحة";
+      }
+    }
+  </script>
+</body>
+</html>

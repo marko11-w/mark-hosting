@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>صفحة المستخدم - MARK</title>
+  <script type="module" src="firebase.js"></script>
+  <script type="module">
+    import { db, ref, onValue } from './firebase.js';
+
+    const motivationalTexts = [
+      "كل يوم هو فرصة جديدة.",
+      "استثمر اليوم، اربح غدًا.",
+      "الناجحون لا ينتظرون، بل يصنعون الفرصة.",
+      "ثق بقراراتك واستمر.",
+      "الأرباح لا تأتي من التردد."
+    ];
+
+    function showUserData(user) {
+      const startDate = new Date(user.registeredAt || Date.now());
+      const today = new Date();
+      const days = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+      const profitPerDay = user.amount * 0.15;
+      const totalProfit = profitPerDay * days;
+
+      document.getElementById("username").textContent = user.username;
+      document.getElementById("amount").textContent = user.amount + " د.ع";
+      document.getElementById("daily").textContent = Math.floor(profitPerDay) + " د.ع";
+      document.getElementById("total").textContent = Math.floor(totalProfit) + " د.ع";
+      document.getElementById("days").textContent = days + " يوم";
+      document.getElementById("motivation").textContent = motivationalTexts[Math.floor(Math.random() * motivationalTexts.length)];
+
+      if (totalProfit >= 50000) {
+        document.getElementById("withdraw").style.display = "inline-block";
+      }
+    }
+
+    function loadUser() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const userKey = urlParams.get("key");
+
+      if (!userKey) {
+        alert("لا يوجد مستخدم محدد");
+        return;
+      }
+
+      const approvedUsersRef = ref(db, "approved_users");
+
+      onValue(approvedUsersRef, (snapshot) => {
+        const data = snapshot.val();
+        for (const [key, user] of Object.entries(data)) {
+          if (key === userKey) {
+            showUserData(user);
+            break;
+          }
+        }
+      });
+    }
+
+    window.onload = loadUser;
+  </script>
+  <style>
+    body { font-family: sans-serif; direction: rtl; text-align: center; background: #f9f9f9; }
+    .box { margin: 50px auto; padding: 20px; width: 90%; max-width: 500px; background: white; border-radius: 10px; }
+    .data { margin: 10px 0; font-size: 18px; }
+    #withdraw {
+      display: none;
+      margin-top: 20px;
+      background-color: #d9534f;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>مرحباً، <span id="username">...</span></h2>
+    <div class="data">مبلغ الاشتراك: <span id="amount"></span></div>
+    <div class="data">الربح اليومي: <span id="daily"></span></div>
+    <div class="data">عدد أيام الربح: <span id="days"></span></div>
+    <div class="data">إجمالي الأرباح: <span id="total"></span></div>
+    <p id="motivation" style="margin-top: 20px; color: green; font-weight: bold;"></p>
+    <button id="withdraw">طلب سحب الأرباح</button>
+  </div>
+</body>
+</html>

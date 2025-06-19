@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>MARK - تسجيل المستخدم</title>
+  <script type="module" src="firebase.js"></script>
+  <script type="module">
+    import { db, ref, push } from './firebase.js';
+
+    function submitUser() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const amount = parseInt(document.getElementById('amount').value);
+      const message = document.getElementById('message');
+
+      if (!username  !password  isNaN(amount) || amount < 50000) {
+        message.textContent = "يرجى إدخال كافة البيانات بشكل صحيح (الحد الأدنى 50,000 د.ع)";
+        return;
+      }
+
+      const userRef = ref(db, 'pending_users');
+      push(userRef, {
+        username,
+        password,
+        amount,
+        approved: false
+      });
+
+      message.style.color = 'green';
+      message.textContent = "✅ تم إرسال الطلب، بانتظار موافقة الأدمن";
+    }
+
+    window.submitUser = submitUser;
+  </script>
+  <style>
+    body { font-family: sans-serif; direction: rtl; text-align: center; background: #f4f4f4; }
+    .container { margin-top: 80px; padding: 30px; background: white; border-radius: 10px; display: inline-block; }
+    input, button { margin: 10px; padding: 10px; width: 250px; }
+    button { background: green; color: white; border: none; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>تسجيل دخول المستخدم</h2>
+    <input id="username" placeholder="اسم المستخدم"><br>
+    <input id="password" type="password" placeholder="كلمة المرور"><br>
+    <input id="amount" type="number" placeholder="مبلغ الاشتراك (الحد الأدنى 50000)"><br>
+    <button onclick="submitUser()">إرسال الطلب</button>
+    <p id="message" style="color: red;"></p>
+  </div>
+</body>
+</html>
