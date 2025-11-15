@@ -196,17 +196,16 @@ def has_channel_rewarded(user_id: int, channel_id: int) -> bool:
     return channel_id in u.get("joined_channels", [])
 
 
-def mark_channel_rewarded(user_id: int, channel_id: int):
-    """تسجيل أن المستخدم حصل على نقاط هذه القناة."""
+def get_stats() -> Dict[str, Any]:
+    """إرجاع إحصائيات عامة عن المستخدمين والطلبات."""
     users = load_users()
-    uid = str(user_id)
+    orders_data = load_orders()
+    orders = list(orders_data.get("orders", {}).values())
+    pending = [o for o in orders if o.get("status") == "pending"]
 
-    if uid not in users:
-        users[uid] = get_user(user_id)
-
-    joined = users[uid].get("joined_channels", [])
-    if channel_id not in joined:
-        joined.append(channel_id)
-
-    users[uid]["joined_channels"] = joined
-    save_users(users)
+    return {
+        "users_count": len(users),
+        "orders_count": len(orders),
+        "pending_orders": len(pending),
+        "orders": orders,
+    }
