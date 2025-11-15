@@ -518,14 +518,15 @@ def main() -> None:
     # Text handler (menu + flows)
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
 
-    port = int(os.getenv("PORT", "8443"))
-    logger.info("Starting webhook on port %s", port)
-    application.run_webhook(
-        listen="0.0.0.0",
-        port=port,
-        url_path=TOKEN,
-        webhook_url=f"{WEBHOOK_URL}/{TOKEN}",
-    )
+  port = int(os.getenv("PORT", "8443"))
+logger.info("Starting webhook on port %s", port)
+application.run_webhook(
+    listen="0.0.0.0",
+    port=port,
+    url_path=TOKEN,
+    webhook_url=f"{WEBHOOK_URL}/{TOKEN}",
+)
+
 
 
 if __name__ == "__main__":
