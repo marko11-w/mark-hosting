@@ -163,8 +163,6 @@ def get_stats() -> Dict[str, Any]:
         {
         "users_count": len(users),
         "orders_count": len(orders),
-        "pending_orders": len(pending),
-        "orders": orders,
     }
 
 
